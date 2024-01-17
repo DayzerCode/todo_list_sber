@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import { ITask } from './Interfaces/ITask';
+import NewTask from './Components/NewTask';
+import TaskList from './Components/TaskList';
 
-function App() {
+const TASK_LOCAL_STORAGE_KEY = 'tasks';
+
+export default function App() {
+  const [tasks, setTasks] = useState<ITask[]>([]);
+
+  useEffect(() => {
+    const tasksFromLocalStorage = localStorage.getItem(TASK_LOCAL_STORAGE_KEY);
+    if (tasksFromLocalStorage) {
+      setTasks(JSON.parse(tasksFromLocalStorage));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (tasks.length > 0) {
+      localStorage.setItem(TASK_LOCAL_STORAGE_KEY, JSON.stringify(tasks));
+    }
+  }, [tasks]);
+  
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <NewTask updateTaskList={setTasks} />
+      <TaskList tasks={tasks} updateTaskList={setTasks} />
     </div>
   );
 }
-
-export default App;
